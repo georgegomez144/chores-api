@@ -6,15 +6,15 @@
     <database>
         <local>
             <host>localhost</host>
-            <database>mban_db</database>
-            <user>mban_admin</user>
-            <pass><![CDATA[Jerusalem<3!]]></pass>
+            <database>efouhpap_chores</database>
+            <user>efouhpap_user</user>
+            <pass><![CDATA[Mother144Thousand!!<3]]></pass>
         </local>
         <live>
-            <host>localhost</host>
-            <database></database>
-            <user>root</user>
-            <pass>root</pass>
+            <host>50.87.249.243</host>
+            <database>efouhpap_chores</database>
+            <user>efouhpap_user</user>
+            <pass><![CDATA[Mother144Thousand!!<3]]></pass>
         </live>
     </database>
     <auth>

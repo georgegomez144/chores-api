@@ -49,6 +49,17 @@ class Database
         $this->pass = PASS;
     }
 
+    public function checkColumnExists($table, $column)
+    {
+        $this->stmt = $this->dbh->prepare("
+            SHOW COLUMNS FROM {$table}
+            LIKE '{$column}'
+        ");
+        $this->stmt->execute();
+        $rowCount = $this->stmt->rowCount();
+        return ($rowCount > 0) ? true : false;
+    }
+
     /**
      * @param $sql
      * @param array $array
@@ -62,7 +73,15 @@ class Database
             $this->stmt->bindValue(":$key", $value);
         }
         $this->stmt->execute();
-        return $this->stmt->fetchAll($fetchMode);
+        $rows = $this->stmt->fetchAll($fetchMode);
+        if (count($rows) === 1)
+        {
+            return $rows[0];
+        }
+        else
+        {
+            return $rows;
+        }
     }
 
     /**
@@ -88,7 +107,7 @@ class Database
         foreach ($array as $key => $value) {
             $this->stmt->bindValue(":$key", $value);
         }
-        $this->stmt->execute();
+        return $this->stmt->execute();
     }
 
     /**
@@ -107,7 +126,7 @@ class Database
         foreach ($array as $key => $value) {
             $this->stmt->bindValue(":$key", $value);
         }
-        $this->stmt->execute();
+        return $this->stmt->execute();
     }
 
     /**
@@ -218,7 +237,7 @@ class Database
         foreach ($array as $key => $value) {
             $this->stmt->bindValue(":$key", $value);
         }
-        $this->stmt->execute();
+        return $this->stmt->execute();
     }
 
     /**
@@ -227,6 +246,6 @@ class Database
     public function deleteAll($table)
     {
         $this->stmt = $this->dbh->prepare("DELETE FROM $table");
-        $this->stmt->execute();
+        return $this->stmt->execute();
     }
 }

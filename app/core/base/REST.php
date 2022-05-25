@@ -210,6 +210,27 @@ final class REST
         }
     }
 
+    public static function queryFilter($filter)
+    {
+        //REST::debug($filter, true);
+        $type = $filter['filterBy'];
+        unset($filter['filterBy']);
+        $filterBy = [];
+        forEach($filter as $key => $value)
+        {
+            if ($type === 'exact')
+            {
+                $filterBy[] = "{$key} = {$value}";
+            }
+            if ($type === 'like')
+            {
+                $filterBy[] = "{$key} LIKE '%{$value}%'";
+            }
+        }
+        $filterBy = implode(' and ', $filterBy);
+        return "WHERE ".$filterBy;
+    }
+
 
 
 
@@ -234,5 +255,11 @@ final class REST
     public static function red($msg)
     {
         echo '<h4 style="color: red;">'.$msg.'</h4>';
+    }
+
+    public static function debug($data, $die = false)
+    {
+        echo '<script>console.log('.json_encode($data).');</script>';
+        if ($die) die();
     }
 }
