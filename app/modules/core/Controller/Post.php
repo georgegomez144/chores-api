@@ -8,17 +8,11 @@
  */
 class Restlet_Core_Controller_Post
 {
-    private $_post;
-
-    public function __construct()
-    {
-        $this->$_post = REST::post();
-    }
 
     public function newMemberAction()
     {
         REST::json(
-            $this->getModel()->saveNewMember(REST::post();
+            $this->getModel()->saveNewMember(REST::post())
         );
     }
 
@@ -26,7 +20,7 @@ class Restlet_Core_Controller_Post
     {
         $data = REST::post();
         REST::json(
-            $this->getModel()->saveNewChore($this->$_post);
+            $this->getModel()->saveNewChore(REST::post())
         );
     }
 
@@ -34,7 +28,7 @@ class Restlet_Core_Controller_Post
     {
         $data = REST::post();
         REST::json(
-            $this->getModel()->saveNewChoreStatus($this->$_post);
+            $this->getModel()->saveNewChoreStatus(REST::post())
         );
     }
 
@@ -42,7 +36,7 @@ class Restlet_Core_Controller_Post
     {
         $data = REST::post();
         REST::json(
-            $this->getModel()->saveNewMemberChoreDay($this->$_post);
+            $this->getModel()->saveNewMemberChoreDay(REST::post())
         );
     }
 

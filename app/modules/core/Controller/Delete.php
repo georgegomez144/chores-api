@@ -12,29 +12,29 @@ class Restlet_Core_Controller_Delete
     public function deleteMemberAction($id)
     {
         REST::json(
-            $this->getModel()->deleteMember($id);
-        )
+            $this->getModel()->deleteMember($id)
+        );
     }
 
     public function deleteChoreAction($id)
     {
         REST::json(
-            $this->getModel()->deleteChore($id);
-        )
+            $this->getModel()->deleteChore($id)
+        );
     }
 
     public function deleteChoreStatusAction($id)
     {
         REST::json(
-            $this->getModel()->deleteChoreStatus($id);
-        )
+            $this->getModel()->deleteChoreStatus($id)
+        );
     }
 
     public function deleteMemberChoreDayAction($id)
     {
         REST::json(
-            $this->getModel()->deleteMemberChoreDay($id);
-        )
+            $this->getModel()->deleteMemberChoreDay($id)
+        );
     }
 
 

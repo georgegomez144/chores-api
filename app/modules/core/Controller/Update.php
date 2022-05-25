@@ -13,32 +13,32 @@ class Restlet_Core_Controller_Update
     {
         $data = REST::post();
         REST::json(
-            $this->getModel()->editMember($id, $data);
-        )
+            $this->getModel()->editMember($id, $data)
+        );
     }
 
     public function editChoreAction($id)
     {
         $data = REST::post();
         REST::json(
-            $this->getModel()->editChore($id, $data);
-        )
+            $this->getModel()->editChore($id, $data)
+        );
     }
 
     public function editChoreStatusAction($id)
     {
         $data = REST::post();
         REST::json(
-            $this->getModel()->editChoreStatus($id, $data);
-        )
+            $this->getModel()->editChoreStatus($id, $data)
+        );
     }
 
     public function editMemberChoreDayAction($id)
     {
         $data = REST::post();
         REST::json(
-            $this->getModel()->editMemberChoreDay($id, $data);
-        )
+            $this->getModel()->editMemberChoreDay($id, $data)
+        );
     }
 
 
