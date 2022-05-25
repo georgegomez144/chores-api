@@ -8,6 +8,11 @@
  */
 class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getMember($id)
     {
         $memberData = $this->getMemberData($id);
@@ -22,10 +27,25 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
         return $memberData;
     }
 
+    public function saveNewMember($data)
+    {
+        return $this->saveNewMemberData($data);
+    }
+
+    public function editMember($id, $data)
+    {
+        return $this->editMemberData($id, $data);
+    }
+
+    public function deleteMember($id)
+    {
+        return $this->deleteMemberData($id);
+    }
+
     public function getMembers($filter)
     {
         $members = $this->getMembersData($filter);
-        if (array_key_first($members) ==0)
+        if (array_key_first($members) == 0)
         {
             foreach ($members as $key => $member)
             {
@@ -74,6 +94,21 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
                 ]);
         }
         return $chore;
+    }
+
+    public function saveNewChore($data)
+    {
+        return $this->saveNewChoreData($data);
+    }
+
+    public function editChore($id, $data)
+    {
+        return $this->editChoreData($id, $data);
+    }
+
+    public function deleteChore($id)
+    {
+        return $this->deleteChoreData($id);
     }
 
     public function getChores($filter)
@@ -154,5 +189,35 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
                     }
         }
         return $days;
+    }
+
+    public function saveNewChoreStatus($data)
+    {
+        return $this->saveNewChoreStatusData($data);
+    }
+
+    public function editChoreStatus($id, $data)
+    {
+        return $this->editChoreStatusData($id, $data);
+    }
+
+    public function deleteChoreStatus($id)
+    {
+        return $this->deleteChoreStatusData($id);
+    }
+
+    public function saveNewMemberChoreDay($data)
+    {
+        return $this->saveNewMemberChoreDayData($data);
+    }
+
+    public function editMemberChoreDay($id, $data)
+    {
+        return $this->editMemberChoreDayData($id, $data);
+    }
+
+    public function deleteMemberChoreDay($id)
+    {
+        return $this->deleteMemberChoreDayData($id);
     }
 }

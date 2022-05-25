@@ -18,6 +18,20 @@ class Restlet_Core_Helper_Data
         return $members;
     }
 
+    public function saveNewMemberData($data)
+    {
+        return $this->insert('member', $data);
+    }
+
+    public function editMemberData($id, $data)
+    {
+        return $this->update('member', "member_id = {$id}", $data);
+    }
+
+    public function deleteMemberData($id)
+    {
+        return $this->delete('member', "member_id = :id", $id);
+    }
 
     public function getMembersData($filter)
     {
@@ -61,6 +75,21 @@ class Restlet_Core_Helper_Data
             WHERE chore.chore_id = :id
         ", $id);
         return $chore;
+    }
+
+    public function saveNewChoreData($data)
+    {
+        return $this->insert('chore', $data);
+    }
+
+    public function editChoreData($id, $data)
+    {
+        return $this->update('chore', "chore_id = {$id}", $data);
+    }
+
+    public function deleteChoreData($id)
+    {
+        return $this->delete('chore', "chore_id = :id", $id);
     }
 
     public function getChoresData($filter)
@@ -139,6 +168,21 @@ class Restlet_Core_Helper_Data
         return $this->select($query);
     }
 
+    public function saveNewChoreStatusData($data)
+    {
+        return $this->insert('chore_status', $data);
+    }
+
+    public function editChoreStatusData($id, $data)
+    {
+        return $this->update('chore_status', "chore_status_id = {$id}", $data);
+    }
+
+    public function deleteChoreStatusData($id)
+    {
+        return $this->delete('chore_status', "chore_status_id = :id", $id);
+    }
+
     public function getMemberChoreDayData($filter)
     {
         $filterQuery = $this->_checkFilterAndReturn('member_chore_day', $filter);
@@ -147,6 +191,21 @@ class Restlet_Core_Helper_Data
             {$filterQuery}
         ";
         return $this->select($query);
+    }
+
+    public function saveNewMemberChoreDayData($data)
+    {
+        return $this->insert('member_chore_day', $data);
+    }
+
+    public function editMemberChoreDayData($id, $data)
+    {
+        return $this->update('member_chore_day', "member_chore_day_id = {$id}", $data);
+    }
+
+    public function deleteMemberChoreDayData($id)
+    {
+        return $this->delete('member_chore_day', "member_chore_day_id = :id", $id);
     }
 
 

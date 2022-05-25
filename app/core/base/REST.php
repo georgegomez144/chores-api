@@ -11,6 +11,7 @@ final class REST
     private static $_auth = [];
     private static $_db = [];
     private static $_url = [];
+    private static $_json = [];
 
     /**
      * Start REST-let App here.....
@@ -75,6 +76,11 @@ final class REST
         include (file_exists($file)) ? $file : die('file does not exist');
         $className = implode('_',[APP_NAME,ucfirst($model[0]),'Model',ucfirst($model[1])]);
         return new $className();
+    }
+
+    public static function post()
+    {
+        return json_decode(file_get_contents('php://input'));
     }
 
     /**
@@ -158,11 +164,17 @@ final class REST
      */
     public static function getHeaders($index = null)
     {
+        $headersArr = [];
+        foreach(headers_list() as $header)
+        {
+            $headerSplit = explode(':', $header);
+            $headersArr[$headerSplit[0]] = $headerSplit[1];
+        }
         if($index !== null)
         {
-            return headers_list()[$index];
+            return apache_request_headers()[$index] ?? $headersArr[$index];
         }
-        return headers_list();
+        return array_merge($headersArr, apache_request_headers());
     }
 
     /**
@@ -170,22 +182,31 @@ final class REST
      */
     public static function _access()
     {
-        $errorMessage = '<p>failed...bad credentials provided.<br /><strong>admin has been notified</strong></p>';
+        $eMsg = '<p>failed...bad credentials provided.<br /><strong>admin has been notified</strong></p>';
         if(!isset($_GET['hash']))
         {
-            $headers = REST::getHeaders();
-            if(!in_array('HASH:'.REST::getAuth('hash'),$headers))
-            { REST::red($errorMessage); return die; }
+            do
+            {
+                $headerRequest = self::getHeaders('HASH');
+                if (!empty($headerRequest) && $headerRequest === self::getAuth('hash')) break;
+                self::red($eMsg); die;
+            } while(0);
         } else {
             $providedSecurity = $_GET['hash'];
             if(REST::getAuth('hash') !== $providedSecurity)
-            { REST::red($errorMessage); return die; }
+            { self::red($eMsg); die; }
         }
+    }
+
+    private static function _setJson($any)
+    {
+        self::$_json[] = $any;
     }
 
     public static function json($any)
     {
         header("Content-Type: application/json");
+        self::_setJson($any);
         echo json_encode($any);
     }
 
@@ -212,7 +233,6 @@ final class REST
 
     public static function queryFilter($filter)
     {
-        //REST::debug($filter, true);
         $type = $filter['filterBy'];
         unset($filter['filterBy']);
         $filterBy = [];
@@ -260,6 +280,85 @@ final class REST
     public static function debug($data, $die = false)
     {
         echo '<script>console.log('.json_encode($data).');</script>';
-        if ($die) die();
+        if ($die) die;
+    }
+
+    public static function toScreen($data, $die = true)
+    {
+        echo "
+            <link href=\"https://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\">
+            <style>
+                icon {
+                    font-family: Material Icons;
+                    font-size: 24px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin: 5px;
+                    height: 40px;
+                    width: 40px;
+                    cursor: pointer;
+                    color: #bbb;
+                }
+                icon:hover {
+                    color: #fff;
+                }
+                .hide { display: none; }
+                .vertical-text {
+                    writing-mode: vertical-rl;
+                    text-orientation: upright;
+                }
+                #screen-debug {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-start;
+                    align-items: flex-start;
+                    height: 100%;
+                    width: 50%;
+                    background-color: #111;
+                    color: #fff;
+                }
+                #screen-debug.closed {
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    align-items: center;
+                    width: 50px;
+                }
+                #screen-debug.closed .vertical-text { display: block; }
+                #screen-debug .vertical-text,
+                #screen-debug.closed pre{ display: none; }
+                #screen-debug pre {
+                    height: calc(100% - 25px);
+                    width: calc(100% - 70px);
+                    padding: 2%;
+                    background-color: #222;
+                    color: #FF0;
+                }
+            </style>
+            <div id=\"screen-debug\" class=\"closed\">
+                <icon>menu</icon>
+                <p class=\"vertical-text\">Debug Window</p>
+                <pre>".$data."</pre>
+            </div>
+            <script>
+            (() => {
+                const debug = document.getElementById('screen-debug');
+                const menuIcon = debug.querySelector('icon');
+                menuIcon.addEventListener('click', function() {
+                    if (debug.classList.contains('closed')) {
+                        debug.classList.remove('closed');
+                        this.textContent = 'menu_open';
+                    } else {
+                        debug.classList.add('closed');
+                        this.textContent = 'menu';
+                    }
+                });
+            })()
+            </script>
+        ";
+        if ($die) die;
     }
 }

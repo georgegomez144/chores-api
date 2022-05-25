@@ -7,7 +7,7 @@ define('ROOT', $_SERVER['DOCUMENT_ROOT']);
 define('SERVER_LOCATION','live');
 define('SERVER_PORT',$_SERVER['SERVER_PORT']);
 
-include ROOT.D.'app/'.D.'core'.D.'base'.D.'REST.php';
+include ROOT.D.'app'.D.'core'.D.'base'.D.'REST.php';
 
 $config = REST::loadxml(ROOT.D.'app'.D.'core'.D.'etc'.D.'config.xml');
 define('APP_NAME',$config->name);
