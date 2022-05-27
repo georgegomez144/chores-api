@@ -25,7 +25,7 @@ class Restlet_Core_Helper_Data
 
     public function editMemberData($id, $data)
     {
-        return $this->update('member', "member_id = {$id}", $data);
+        return $this->update('member', "member_id = {$id['id']}", $data);
     }
 
     public function deleteMemberData($id)
@@ -84,7 +84,7 @@ class Restlet_Core_Helper_Data
 
     public function editChoreData($id, $data)
     {
-        return $this->update('chore', "chore_id = {$id}", $data);
+        return $this->update('chore', "chore_id = {$id['id']}", $data);
     }
 
     public function deleteChoreData($id)
@@ -102,14 +102,14 @@ class Restlet_Core_Helper_Data
         return $this->select($query);
     }
 
-    public function getChoreDaysData($id)
+    public function getChoreDaysData($id, $where)
     {
         $query = "
             SELECT DISTINCT
                 day.*
             FROM day
             LEFT JOIN member_chore_day on member_chore_day.day_id = day.day_id
-            WHERE member_chore_day.chore_id = :id
+            WHERE member_chore_day.chore_id = :id {$where}
         ";
         return $this->select($query, $id);
     }
@@ -131,9 +131,10 @@ class Restlet_Core_Helper_Data
     {
         $query = "
             SELECT DISTINCT
-                chore.*
+                chore.*, chore_status.*
             FROM chore
             LEFT JOIN member_chore_day on member_chore_day.chore_id = chore.chore_id
+            LEFT JOIN chore_status on member_chore_day.member_chore_day_id = chore_status.member_chore_day_id
             WHERE member_chore_day.day_id = :id
         ";
         return $this->select($query, $id);
@@ -150,7 +151,8 @@ class Restlet_Core_Helper_Data
 
     public function getDaysData($filter)
     {
-        $filterQuery = $this->_checkFilterAndReturn('day', $filter);
+        $filterQuery = '';
+        if(array_key_exists('filterBy', $filter)) $filterQuery = $this->_checkFilterAndReturn('day', $filter);
         $query = "
             SELECT * FROM day
             {$filterQuery}
@@ -175,7 +177,7 @@ class Restlet_Core_Helper_Data
 
     public function editChoreStatusData($id, $data)
     {
-        return $this->update('chore_status', "chore_status_id = {$id}", $data);
+        return $this->update('chore_status', "chore_status_id = {$id['id']}", $data);
     }
 
     public function deleteChoreStatusData($id)
@@ -200,7 +202,7 @@ class Restlet_Core_Helper_Data
 
     public function editMemberChoreDayData($id, $data)
     {
-        return $this->update('member_chore_day', "member_chore_day_id = {$id}", $data);
+        return $this->update('member_chore_day', "member_chore_day_id = {$id['id']}", $data);
     }
 
     public function deleteMemberChoreDayData($id)
@@ -218,11 +220,12 @@ class Restlet_Core_Helper_Data
     private function _checkFilterAndReturn($table, $filter)
     {
         if (empty($filter)) return '';
+        if (array_key_exists('filter', $filter)) return '';
         do {
             $filterCopy = $filter;
             unset($filterCopy['filterBy']);
             if (!$this->checkColumnExists($table, array_key_first($filterCopy))) {break;}
-            return REST::queryFilter($filter);
+            return REST::queryFilter($table, $filter);
         } while(0);
     }
 }

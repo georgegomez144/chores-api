@@ -114,9 +114,19 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
     public function getChores($filter)
     {
         $chores = $this->getChoresData($filter);
+
+        $postFilter = array_key_exists('filter', $filter);
+
+        $filterBy = $filter['filter'];
+            unset($filter['filter']);
+        $whereKey = array_key_first($filter);
+        $whereValue = $filter[$whereKey];
+
         foreach ($chores as $key => $chore)
         {
-            $chores[$key]['days'] = $this->getChoreDaysData(['id' => $chore['chore_id']]);
+            $where = '';
+            if($postFilter && $filterBy === 'days') $where = "AND day.{$whereKey} = {$whereValue}";
+            $chores[$key]['days'] = $this->getChoreDaysData(['id' => $chore['chore_id']], $where);
 
             if (array_key_first($chores[$key]['days']) == 0)
             {
@@ -143,24 +153,7 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
     public function getDay($id)
     {
         $day = $this->getDayData($id);
-        $day['chores'] = $this->getDayChoresData(['id' => $day['day_id']]);
-        if (array_key_first($day['chores']) == 0)
-        {
-            foreach($day['chores'] as $cKey => $chore)
-            {
-                $day['chores'][$cKey]['members'] = $this
-                    ->getChoreDayMembersData([
-                        'day_id'    => $day['day_id'],
-                        'chore_id'  => $chore['chore_id']
-                    ]);
-            }
-        } else {
-            $day['chores']['members'] = $this
-                ->getChoreDayMembersData([
-                    'day_id'    => $day['day_id'],
-                    'chore_id'  => $chore['chore_id']
-                ]);
-        }
+        $day['chores'] = $this->addChoresToDays($day);
         return $day;
     }
 
@@ -169,26 +162,33 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
         $days = $this->getDaysData($filter);
         foreach ($days as $key => $day)
         {
-            $days[$key]['chores'] = $this->getDayChoresData(['id' => $day['day_id']]);
-            if (array_key_first($days[$key]['chores']) == 0)
-                    {
-                        foreach($days[$key]['chores'] as $cKey => $chore)
-                        {
-                            $days[$key]['chores'][$cKey]['members'] = $this
-                                ->getChoreDayMembersData([
-                                    'day_id'    => $days[$key]['day_id'],
-                                    'chore_id'  => $chore['chore_id']
-                                ]);
-                        }
-                    } else {
-                        $days[$key]['chores']['members'] = $this
-                            ->getChoreDayMembersData([
-                                'day_id'    => $days[$key]['day_id'],
-                                'chore_id'  => $chore['chore_id']
-                            ]);
-                    }
+            $days[$key]['chores'] = $this->addChoresToDays($day);
         }
         return $days;
+    }
+
+    private function addChoresToDays($day)
+    {
+        $chores = $this->getDayChoresData(['id' => $day['day_id']]);
+        //REST::toScreen($chores);
+        if (array_key_first($chores) == 0)
+        {
+            foreach($chores as $cKey => $chore)
+            {
+                $chores[$cKey]['members'] = $this
+                    ->getChoreDayMembersData([
+                        'day_id'    => $day['day_id'],
+                        'chore_id'  => $chore['chore_id']
+                    ]);
+            }
+        } else {
+            $chores['members'] = $this
+                ->getChoreDayMembersData([
+                    'day_id'    => $day['day_id'],
+                    'chore_id'  => $chore['chore_id']
+                ]);
+        }
+        return $chores;
     }
 
     public function saveNewChoreStatus($data)

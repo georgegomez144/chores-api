@@ -80,7 +80,8 @@ final class REST
 
     public static function post()
     {
-        return json_decode(file_get_contents('php://input'));
+        $json = file_get_contents('php://input');
+        return json_decode($json, true);
     }
 
     /**
@@ -182,19 +183,25 @@ final class REST
      */
     public static function _access()
     {
-        $eMsg = '<p>failed...bad credentials provided.<br /><strong>admin has been notified</strong></p>';
+        $eMsg = [
+            'status'                    => 404,
+            'message'                   => 'failed...bad credentials provided.',
+            //'headers_list'              => headers_list(),
+            //'apache_request_headers'    => apache_request_headers(),
+            //'getallheaders'             => getallheaders(),
+        ];
         if(!isset($_GET['hash']))
         {
             do
             {
-                $headerRequest = self::getHeaders('HASH');
+                $headerRequest = self::getHeaders('Hash');
                 if (!empty($headerRequest) && $headerRequest === self::getAuth('hash')) break;
-                self::red($eMsg); die;
+                self::json($eMsg); die;
             } while(0);
         } else {
             $providedSecurity = $_GET['hash'];
-            if(REST::getAuth('hash') !== $providedSecurity)
-            { self::red($eMsg); die; }
+            if(self::getAuth('hash') !== $providedSecurity)
+            { self::json($eMsg); die; }
         }
     }
 
@@ -231,7 +238,7 @@ final class REST
         }
     }
 
-    public static function queryFilter($filter)
+    public static function queryFilter($tabls, $filter)
     {
         $type = $filter['filterBy'];
         unset($filter['filterBy']);
@@ -240,11 +247,11 @@ final class REST
         {
             if ($type === 'exact')
             {
-                $filterBy[] = "{$key} = {$value}";
+                $filterBy[] = "{$table}.{$key} = {$value}";
             }
             if ($type === 'like')
             {
-                $filterBy[] = "{$key} LIKE '%{$value}%'";
+                $filterBy[] = "{$table}.{$key} LIKE '%{$value}%'";
             }
         }
         $filterBy = implode(' and ', $filterBy);
@@ -268,7 +275,7 @@ final class REST
         if($bool)
         {
             header("USER:15caf4c16c8c1b64266e8a13ec65e44f69066995");
-            header("HASH:".AUTH_HASH);
+            header("Hash:".AUTH_HASH);
         }
     }
 
@@ -317,43 +324,54 @@ final class REST
                     justify-content: flex-start;
                     align-items: flex-start;
                     height: 100%;
-                    width: 50%;
+                    max-width: 20%;
+                    padding-right: 1rem;
+                    padding-bottom: 1rem;
                     background-color: #111;
                     color: #fff;
+                    box-shadow: 0 10px 20px rgb(0 0 0 / 50%), 0 4px 5px rgb(0 0 0 / 94%);
                 }
                 #screen-debug.closed {
                     flex-direction: column;
                     justify-content: flex-start;
                     align-items: center;
                     width: 50px;
+                    padding: 0;
                 }
                 #screen-debug.closed .vertical-text { display: block; }
                 #screen-debug .vertical-text,
                 #screen-debug.closed pre{ display: none; }
                 #screen-debug pre {
-                    height: calc(100% - 25px);
-                    width: calc(100% - 70px);
-                    padding: 2%;
+                    height: 91%;
+                    width: auto;
+                    max-width: 88%;
+                    padding: 1rem;
                     background-color: #222;
+                    white-space: pre-wrap;
+                    border-radius: 1rem;
                     color: #FF0;
+                    border: 2px solid #090909;
                 }
             </style>
             <div id=\"screen-debug\" class=\"closed\">
                 <icon>menu</icon>
                 <p class=\"vertical-text\">Debug Window</p>
-                <pre>".$data."</pre>
+                <pre id=\"output_screen\"></pre>
             </div>
             <script>
             (() => {
                 const debug = document.getElementById('screen-debug');
+                const output = document.getElementById('output_screen');
                 const menuIcon = debug.querySelector('icon');
                 menuIcon.addEventListener('click', function() {
                     if (debug.classList.contains('closed')) {
                         debug.classList.remove('closed');
                         this.textContent = 'menu_open';
+                        output.textContent = JSON.stringify(".json_encode($data).", null, 2);
                     } else {
                         debug.classList.add('closed');
                         this.textContent = 'menu';
+                        output.textContent = '';
                     }
                 });
             })()

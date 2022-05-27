@@ -223,7 +223,7 @@ class Database
         $this->stmt->execute();
         $id = $this->dbh->lastInsertId();
         $newRow = $this->select("select * from ".$table." where ".$table."_id = :id",array("id"=>$id));
-        return $newRow[0];
+        return $newRow;
     }
 
     /**
