@@ -102,7 +102,7 @@ class Restlet_Core_Helper_Data
         return $this->select($query);
     }
 
-    public function getChoreDaysData($id, $where)
+    public function getChoreDaysData($id, $where = "")
     {
         $query = "
             SELECT DISTINCT
@@ -127,15 +127,16 @@ class Restlet_Core_Helper_Data
         return $this->select($query, $ids);
     }
 
-    public function getDayChoresData($id)
+    public function getDayChoresData($id, $where = "")
     {
         $query = "
             SELECT DISTINCT
-                chore.*, chore_status.*
+                chore.*, chore_status.*, member_chore_day.member_chore_day_id, member.*
             FROM chore
             LEFT JOIN member_chore_day on member_chore_day.chore_id = chore.chore_id
             LEFT JOIN chore_status on member_chore_day.member_chore_day_id = chore_status.member_chore_day_id
-            WHERE member_chore_day.day_id = :id
+            LEFT JOIN member on member_chore_day.member_id = member.member_id
+            WHERE member_chore_day.day_id = :id {$where}
         ";
         return $this->select($query, $id);
     }

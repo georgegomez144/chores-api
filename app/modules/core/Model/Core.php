@@ -162,17 +162,31 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
         $days = $this->getDaysData($filter);
         foreach ($days as $key => $day)
         {
-            $days[$key]['chores'] = $this->addChoresToDays($day);
+            $days[$key]['chores'] = $this->addChoresToDays($day, $filter);
         }
         return $days;
     }
 
-    private function addChoresToDays($day)
+    private function addChoresToDays($day, $filter = [])
     {
-        $chores = $this->getDayChoresData(['id' => $day['day_id']]);
-        //REST::toScreen($chores);
-        if (array_key_first($chores) == 0)
+        $postFilter = array_key_exists('filter', $filter);
+        $where = '';
+
+        if ($postFilter)
         {
+            $filterBy = $filter['filter'];
+                unset($filter['filter']);
+            $whereKey = array_key_first($filter);
+            $whereValue = $filter[$whereKey];
+            $where = "AND {$filterBy}.{$whereKey} = {$whereValue}";
+        }
+
+        $chores = $this->getDayChoresData(['id' => $day['day_id']], $where);
+        //REST::toScreen([$filter, $chores]);
+
+        /* if (array_key_first($chores) == 0)
+        {
+            $where = '';
             foreach($chores as $cKey => $chore)
             {
                 $chores[$cKey]['members'] = $this
@@ -187,7 +201,7 @@ class Restlet_Core_Model_Core extends Restlet_Core_Helper_Data
                     'day_id'    => $day['day_id'],
                     'chore_id'  => $chore['chore_id']
                 ]);
-        }
+        } */
         return $chores;
     }
 

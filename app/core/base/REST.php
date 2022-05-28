@@ -351,6 +351,7 @@ final class REST
                     border-radius: 1rem;
                     color: #FF0;
                     border: 2px solid #090909;
+                    overflow: auto;
                 }
             </style>
             <div id=\"screen-debug\" class=\"closed\">
